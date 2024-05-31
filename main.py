@@ -1,6 +1,9 @@
-import time
-from fastapi import FastAPI, BackgroundTasks
+import datetime
+
+from fastapi import FastAPI
 from celery import Celery
+
+from task import call_background_task
 
 app = FastAPI()
 
@@ -12,14 +15,8 @@ celery = Celery(
 )
 
 
-@celery.task()
-def call_background_task(message):
-    time.sleep(10)
-    print(f"Background Task called!")
-    print(message)
-
-
 @app.get("/")
 async def hello_world(message: str):
-    call_background_task.delay(message)
+    task_datetime = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=10)
+    call_background_task.apply_async(args=[message], eta=task_datetime, expires=3600)
     return {'message': 'Hello World!'}
