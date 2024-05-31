@@ -14,6 +14,13 @@ celery = Celery(
     broker_connection_retry_on_startup=True
 )
 
+celery.conf.beat_schedule = {
+    'run-me-background-task': {
+        'task': 'task.call_background_task',
+        'schedule': 60,
+        'args': ('Test text message',)
+    }
+}
 
 @app.get("/")
 async def hello_world(message: str):
