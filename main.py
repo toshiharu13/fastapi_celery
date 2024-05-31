@@ -1,5 +1,6 @@
 import datetime
 
+from celery.schedules import crontab
 from fastapi import FastAPI
 from celery import Celery
 
@@ -17,7 +18,7 @@ celery = Celery(
 celery.conf.beat_schedule = {
     'run-me-background-task': {
         'task': 'task.call_background_task',
-        'schedule': 60,
+        'schedule': crontab(hour=7, minute=0),
         'args': ('Test text message',)
     }
 }
